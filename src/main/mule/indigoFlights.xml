@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="c2e4b2d4-e3ae-4cff-a7f2-881e09a42791" >
+		<http:request-connection host="indigo-service-https.us-e2.cloudhub.io" port="443" protocol="HTTPS">
+			<tls:context >
+				<tls:trust-store path="truststore.ts" password="mulesoftts" type="jks" insecure="true"/>
+			</tls:context>
+		</http:request-connection>
+	</http:request-config>
+	<flow name="indigoFlightsFlow" doc:id="9aa21925-cf01-4cf8-8305-df2f5dbe2091" >
+		<logger level="INFO" doc:name="Logger" doc:id="c6afe252-91fd-4599-9ab3-550ca9a6f803" message="indigoFlights Flow starts.............."/>
+		<http:request method="GET" doc:name="Request" doc:id="53eb281b-4205-4a83-a6c9-ae69aa9b6670" config-ref="HTTP_Request_configuration" path="/api/getFlights">
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	from : attributes.queryParams.source,
+	to : attributes.queryParams.destination,
+	depatureDate : attributes.queryParams.doj
+}]]]></http:query-params>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="df2c0638-bbb2-4aae-92be-2b21c0d951a9" message="after restful response of indigoFlights Flow.............#[payload]"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="6899ff45-671e-4a3d-b151-79ceb74aac1a" >
+				<logger level="INFO" doc:name="Logger" doc:id="fc75fc94-969f-4f76-8746-019bf0cb4ecc" message="on error propagate............."/>
+				<ee:transform doc:name="Transform Message" doc:id="4a04d5bd-71b6-41c9-81dc-3bc642ca4bca" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	statusCode:500,
+	message:"Unable to process your request,due to server is down"
+}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="httpStatus" ><![CDATA[500]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>
