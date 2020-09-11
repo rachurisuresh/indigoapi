@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="indigoFlightsByuriParamsFlow" doc:id="67fffc9d-ff03-492f-ab1d-3caf82576bd7" >
+		<logger level="INFO" doc:name="Logger" doc:id="9664a334-f26c-46c9-b2db-91cb86866704" message="indigoFloghtsByuriParamsFlow starts..................."/>
+		<http:request method="GET" doc:name="Request" doc:id="2bf14f54-bac6-410b-b8a5-cce0f1e07f43" config-ref="HTTP_Request_configuration" path="/api/getFlights" >
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	from : attributes.queryParams.source,
+	to : attributes.queryParams.destination,
+	depatureDate : attributes.queryParams.doj
+}]]]></http:query-params>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="0bbc4faf-5dda-48ee-b7ad-c10f6c40fb77" message="after restful response of indigoFlightsByuriParams Flow.............#[payload]" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="f9e9430a-3a9b-49d8-b0e5-938a2553f9f5" >
+				<ee:transform doc:name="Transform Message" doc:id="48a300c1-da91-49ff-b15e-1ccc961bc828" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	statusCode:500,
+	message:"server is in down state"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>

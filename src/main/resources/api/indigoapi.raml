@@ -17,5 +17,15 @@ types:
             type: indigoFlights[]
             example: !include examples/indigoFlightsExample.raml
             
+  /{source}/{destination}/{doj}:
+    get:
+      responses:
+        200:
+          body:
+            application/json:
+              type: indigoFlights[]
+              example: !include examples/indigoFlightsExample.raml
+                          
+            
                       
   
