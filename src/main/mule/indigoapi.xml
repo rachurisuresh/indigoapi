@@ -130,7 +130,7 @@ output application/json
 		<flow-ref doc:name="indigoFlightsFlow" doc:id="96fd80f4-20c8-4873-9e48-4545e615ce21" name="indigoFlightsFlow"/>
 		<logger level="INFO" doc:name="Logger" doc:id="64cd7b98-0643-41b3-a818-6e6feac0890d" message="final response of the indigoFlights.....................#[payload]"/>
     </flow>
-	<flow name="get:/{source}/{destination}/{doj}:indigoapi-config" doc:id="88768f31-5b30-4757-a93f-d71be85917b9" >
+	<flow name="get:\indigoFlights\(source)\(destination)\(doj):indigoapi-config" doc:id="88768f31-5b30-4757-a93f-d71be85917b9" >
 		<logger level="INFO" doc:name="Logger" doc:id="5ba2604a-9137-4978-8ef1-9a9af039087b" message="request received and the uriParameters are...........#[attributes.uriParams]" />
 		<flow-ref doc:name="indigoFlightsByuriParamsFlow" doc:id="2b2fa01e-d373-47e6-85de-b4f0dc252e23" name="indigoFlightsByuriParamsFlow" />
 		<logger level="INFO" doc:name="Logger" doc:id="928dca32-3a35-4f5a-a6ac-9f9ce548aab5" message="final response of the indigoFlightsByuriParams.....................#[payload]" />
